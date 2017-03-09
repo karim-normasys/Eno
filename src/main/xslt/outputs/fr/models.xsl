@@ -4,7 +4,8 @@
     xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:fn="http://www.w3.org/2005/xpath-functions"
     xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xxf="http://orbeon.org/oxf/xml/xforms"
     xmlns:fr="http://orbeon.org/oxf/xml/form-runner" xmlns:xd="http://www.oxygenxml.com/ns/doc/xsl"
-    xmlns:eno="http://xml.insee.fr/apps/eno" xmlns:enofr="http://xml.insee.fr/apps/eno/form-runner" exclude-result-prefixes="xd eno enofr" version="2.0">
+    xmlns:eno="http://xml.insee.fr/apps/eno" xmlns:enofr="http://xml.insee.fr/apps/eno/form-runner"
+    exclude-result-prefixes="xd eno enofr" version="2.0">
 
     <!-- Orbeon-form-runner related file -->
     <!-- This file is imported in the ddi2fr.xsl file (already in ddi2fr-fixed.xsl) -->
@@ -162,7 +163,8 @@
                             <xsl:with-param name="driver"
                                 select="eno:append-empty-element('Body', .)" tunnel="yes"/>
                             <xsl:with-param name="languages" select="$languages" tunnel="yes"/>
-                            <xsl:with-param name="instance-ancestor" select="'instance(''fr-form-instance'')//'" tunnel="yes"/>
+                            <xsl:with-param name="instance-ancestor"
+                                select="'instance(''fr-form-instance'')//'" tunnel="yes"/>
                         </xsl:apply-templates>
                     </fr:body>
                 </fr:view>
@@ -173,7 +175,7 @@
     <!-- Default template, creating the corresponding instance element, and going on on the children -->
     <xsl:template match="Instance//*" mode="model">
         <xsl:param name="source-context" as="item()" tunnel="yes"/>
-        <xsl:element name="{enofr:get-name($source-context)}"/>        
+        <xsl:element name="{enofr:get-name($source-context)}"/>
         <xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
             <xsl:with-param name="driver" select="." tunnel="yes"/>
         </xsl:apply-templates>
@@ -292,7 +294,7 @@
 
     <xsl:template match="Instance//Table | Instance//TableLoop" mode="model" priority="1">
         <xsl:param name="source-context" as="item()" tunnel="yes"/>
-        <xsl:element name="{enofr:get-name($source-context)}"/>        
+        <xsl:element name="{enofr:get-name($source-context)}"/>
         <!--<xsl:element name="{concat(enofr:get-name($source-context),'-group')}"/>-->
         <xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
             <xsl:with-param name="driver" select="." tunnel="yes"/>
@@ -564,18 +566,38 @@
         <xsl:param name="source-context" as="item()" tunnel="yes"/>
         <xsl:param name="language" tunnel="yes"/>
         <xsl:element name="{enofr:get-name($source-context)}">
-            <label>
-                <xsl:value-of select="eno:serialize(enofr:get-label($source-context, $language))"/>
-            </label>
-            <hint>
-                <xsl:value-of select="eno:serialize(enofr:get-hint($source-context, $language))"/>
-            </hint>
-            <help>
-                <xsl:value-of select="eno:serialize(enofr:get-help($source-context, $language))"/>
-            </help>
-            <alert>
-                <xsl:value-of select="eno:serialize(enofr:get-alert($source-context, $language))"/>
-            </alert>
+            <xsl:variable name="label">
+                <xsl:copy-of select="enofr:get-label($source-context, $language)"/>
+            </xsl:variable>
+            <xsl:if test="$label/node()">
+                <label>
+                    <xsl:value-of select="eno:serialize($label)"/>
+                </label>
+            </xsl:if>
+            <xsl:variable name="hint">
+                <xsl:copy-of select="enofr:get-hint($source-context, $language)"/>
+            </xsl:variable>
+            <xsl:if test="$hint/node()">
+                <hint>
+                    <xsl:value-of select="eno:serialize($hint)"/>
+                </hint>
+            </xsl:if>
+            <xsl:variable name="help">
+                <xsl:copy-of select="enofr:get-help($source-context, $language)"/>
+            </xsl:variable>
+            <xsl:if test="$help/node()">
+                <help>
+                    <xsl:value-of select="eno:serialize($help)"/>
+                </help>
+            </xsl:if>
+            <xsl:variable name="alert">
+                <xsl:copy-of select="enofr:get-alert($source-context, $language)"/>
+            </xsl:variable>
+            <xsl:if test="$alert/node()">
+                <alert>
+                    <xsl:value-of select="eno:serialize($alert)"/>
+                </alert>
+            </xsl:if>
         </xsl:element>
         <xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
             <xsl:with-param name="driver" select="." tunnel="yes"/>
@@ -586,18 +608,38 @@
         <xsl:param name="source-context" as="item()" tunnel="yes"/>
         <xsl:param name="language" tunnel="yes"/>
         <xsl:element name="{enofr:get-name($source-context)}">
-            <label>
-                <xsl:value-of select="eno:serialize(enofr:get-label($source-context, $language))"/>
-            </label>
-            <hint>
-                <xsl:value-of select="eno:serialize(enofr:get-hint($source-context, $language))"/>
-            </hint>
-            <help>
-                <xsl:value-of select="eno:serialize(enofr:get-help($source-context, $language))"/>
-            </help>
-            <alert>
-                <xsl:value-of select="eno:serialize(enofr:get-alert($source-context, $language))"/>
-            </alert>
+            <xsl:variable name="label">
+                <xsl:copy-of select="enofr:get-label($source-context, $language)"/>
+            </xsl:variable>
+            <xsl:if test="$label/node()">
+                <label>
+                    <xsl:value-of select="eno:serialize($label)"/>
+                </label>
+            </xsl:if>
+            <xsl:variable name="hint">
+                <xsl:copy-of select="enofr:get-hint($source-context, $language)"/>
+            </xsl:variable>
+            <xsl:if test="$hint/node()">
+                <hint>
+                    <xsl:value-of select="eno:serialize($hint)"/>
+                </hint>
+            </xsl:if>
+            <xsl:variable name="help">
+                <xsl:copy-of select="enofr:get-help($source-context, $language)"/>
+            </xsl:variable>
+            <xsl:if test="$help/node()">
+                <help>
+                    <xsl:value-of select="eno:serialize($help)"/>
+                </help>
+            </xsl:if>
+            <xsl:variable name="alert">
+                <xsl:copy-of select="enofr:get-alert($source-context, $language)"/>
+            </xsl:variable>
+            <xsl:if test="$alert/node()">
+                <alert>
+                    <xsl:value-of select="eno:serialize($alert)"/>
+                </alert>
+            </xsl:if>
             <xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
                 <xsl:with-param name="driver" select="." tunnel="yes"/>
             </xsl:apply-templates>
@@ -797,8 +839,10 @@
         <xsl:param name="languages" tunnel="yes"/>
         <xhtml:th colspan="{enofr:get-colspan($source-context)}"
             rowspan="{enofr:get-rowspan($source-context)}">
-            <xsl:if test="enofr:get-code-depth($source-context)!='1' and enofr:get-code-depth($source-context)!=''">
-                <xsl:attribute name="class" select="concat('depth',enofr:get-code-depth($source-context))"/>
+            <xsl:if
+                test="enofr:get-code-depth($source-context)!='1' and enofr:get-code-depth($source-context)!=''">
+                <xsl:attribute name="class"
+                    select="concat('depth',enofr:get-code-depth($source-context))"/>
             </xsl:if>
             <xsl:variable name="cell-text">
                 <Body>
@@ -932,7 +976,8 @@
                 </xsl:for-each>
             </xhtml:thead>
             <xhtml:tbody>
-                <xf:repeat nodeset="{concat($instance-ancestor,enofr:get-name($source-context),'-RowLoop')}"
+                <xf:repeat
+                    nodeset="{concat($instance-ancestor,enofr:get-name($source-context),'-RowLoop')}"
                     id="{concat(enofr:get-name($source-context),'-RowLoop')}">
                     <xhtml:tr>
                         <xsl:apply-templates select="enofr:get-body-line($source-context, 1)"
@@ -992,31 +1037,51 @@
                     <xsl:value-of select="enofr:get-length($source-context)"/>
                 </xsl:attribute>
             </xsl:if>
-            <xf:label ref="$form-resources/{$name}/label">
-                <xsl:if test="eno:is-rich-content(enofr:get-label($source-context, $languages[1]))">
-                    <xsl:attribute name="mediatype">text/html</xsl:attribute>
-                </xsl:if>
-            </xf:label>
-            <xf:hint ref="$form-resources/{$name}/hint">
-                <xsl:if test="eno:is-rich-content(enofr:get-hint($source-context, $languages[1]))">
-                    <xsl:attribute name="mediatype">text/html</xsl:attribute>
-                </xsl:if>
-            </xf:hint>
+            <xsl:variable name="label">
+                <xsl:copy-of select="enofr:get-label($source-context, $languages[1])"/>
+            </xsl:variable>
+            <xsl:if test="$label/node()">
+                <xf:label ref="$form-resources/{$name}/label">
+                    <xsl:if test="eno:is-rich-content($label/node())">
+                        <xsl:attribute name="mediatype">text/html</xsl:attribute>
+                    </xsl:if>
+                </xf:label>
+            </xsl:if>
+            <xsl:variable name="hint">
+                <xsl:copy-of select="enofr:get-hint($source-context, $languages[1])"/>
+            </xsl:variable>
+            <xsl:if test="$hint/node()">
+                <xf:hint ref="$form-resources/{$name}/hint">
+                    <xsl:if test="eno:is-rich-content($hint/node())">
+                        <xsl:attribute name="mediatype">text/html</xsl:attribute>
+                    </xsl:if>
+                </xf:hint>
+            </xsl:if>
+            <xsl:variable name="help">
+                <xsl:copy-of select="enofr:get-help($source-context, $languages[1])"/>
+            </xsl:variable>
+            <xsl:if test="$help/node()">
             <xf:help ref="$form-resources/{$name}/help">
-                <xsl:if test="eno:is-rich-content(enofr:get-help($source-context, $languages[1]))">
+                <xsl:if test="eno:is-rich-content($help/node())">
                     <xsl:attribute name="mediatype">text/html</xsl:attribute>
                 </xsl:if>
             </xf:help>
+            </xsl:if>
+            <xsl:variable name="alert">
+                <xsl:copy-of select="enofr:get-alert($source-context, $languages[1])"/>
+            </xsl:variable>
+            <xsl:if test="$alert/node()">
             <xf:alert ref="$form-resources/{$name}/alert">
                 <xsl:if test="enofr:get-alert-level($source-context) != ''">
                     <xsl:attribute name="level">
                         <xsl:value-of select="enofr:get-alert-level($source-context)"/>
                     </xsl:attribute>
                 </xsl:if>
-                <xsl:if test="eno:is-rich-content(enofr:get-alert($source-context, $languages[1]))">
+                <xsl:if test="eno:is-rich-content($alert/node())">
                     <xsl:attribute name="mediatype">text/html</xsl:attribute>
                 </xsl:if>
             </xf:alert>
+            </xsl:if>
             <xsl:if test="self::xf-select1 or self::xf-select">
                 <xsl:if test="enofr:get-appearance($source-context) = 'minimal'">
                     <xf:item>
@@ -1036,8 +1101,7 @@
                 <xf:action ev:event="xforms-value-changed"
                     if="{concat('substring-after(',$instance-ancestor,$name,','' '') ne ''''')}">
                     <xf:setvalue ref="{concat($instance-ancestor,$name)}"
-                        value="{concat('substring-after(',$instance-ancestor,$name,','' '')')}"
-                    />
+                        value="{concat('substring-after(',$instance-ancestor,$name,','' '')')}"/>
                 </xf:action>
             </xsl:if>
             <!-- For each element which relevance depends on this field, we erase the data if it became unrelevant -->
@@ -1056,7 +1120,7 @@
                     <xf:setvalue ref="." value="''"/>
                 </xf:action>
             </xsl:for-each>
-            
+
             <xsl:for-each select="enofr:get-constraint-dependencies($source-context)">
                 <xsl:element name="xf:dispatch">
                     <xsl:attribute name="ev:event">
