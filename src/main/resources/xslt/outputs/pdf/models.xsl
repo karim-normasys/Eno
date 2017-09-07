@@ -9,7 +9,7 @@
 	xmlns:fox="http://xmlgraphics.apache.org/fop/extensions"
 	version="2.0">
 	
-	<xsl:import href="../../util/pdf/style.xsl"/>
+	<xsl:import href="../../../styles/style.xsl"/>
 
 	<xd:doc>
 		<xd:desc>
@@ -39,9 +39,9 @@
 			
 			<fo:layout-master-set>
 				<fo:simple-page-master master-name="A4-portrail" page-height="297mm"
-					page-width="210mm" margin-top="5mm" margin-bottom="5mm" margin-left="5mm"
-					margin-right="5mm" font-family="arial" font-size="10pt" font-weight="normal">
-					<fo:region-body margin-top="10mm" margin-bottom="20mm"/>
+					page-width="210mm" font-family="arial" font-size="10pt" 
+					font-weight="normal" margin-bottom="5mm">
+					<fo:region-body margin="13mm"/>
 					<fo:region-before region-name="xsl-region-before" extent="25mm"
 						display-align="before" precedence="true"/>
 				</fo:simple-page-master>
@@ -113,23 +113,23 @@
 						<fo:block font-weight="bold" font-size="10pt">
 							Commentaires et remarques :
 						</fo:block>
-						<fo:block>
-							.........................................................................................................................................................................
+						<fo:block xsl:use-attribute-sets="Line-drawing">
+							&#160;
 						</fo:block>
-						<fo:block>
-							.........................................................................................................................................................................
+						<fo:block xsl:use-attribute-sets="Line-drawing">
+							&#160;
 						</fo:block>
-						<fo:block>
-							.........................................................................................................................................................................
+						<fo:block xsl:use-attribute-sets="Line-drawing">
+							&#160;
 						</fo:block>
-						<fo:block>
-							.........................................................................................................................................................................
+						<fo:block xsl:use-attribute-sets="Line-drawing">
+							&#160;
 						</fo:block>
-						<fo:block>
-							.........................................................................................................................................................................
+						<fo:block xsl:use-attribute-sets="Line-drawing">
+							&#160;
 						</fo:block>
-						<fo:block>
-							.........................................................................................................................................................................
+						<fo:block xsl:use-attribute-sets="Line-drawing">
+							&#160;
 						</fo:block>
 					</fo:block-container>
 					
@@ -147,7 +147,7 @@
 						<fo:block>Ce droit peut être exercé auprès de $MOA.</fo:block>
 						
 					</fo:block-container>			
-					<fo:block background-color="#666666" border="solid" padding="2mm" margin-left="80%" margin-top="3%">
+					<fo:block background-color="#666666" border="solid" padding="2mm" margin-left="80%" margin-top="1%">
 						$CodeBar
 					</fo:block>
 					<fo:block width="100%" margin-top="1%">
@@ -176,7 +176,7 @@
 			<xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
 				<xsl:with-param name="driver" select="." tunnel="yes"/>
 			</xsl:apply-templates>
-
+		
 		</fo:root>
 
 	</xsl:template>
@@ -198,7 +198,8 @@
 		<fo:page-sequence master-reference="A4-portrail">
 			<fo:flow flow-name="xsl-region-body" border-collapse="collapse"
 				reference-orientation="0">
-				<fo:block xsl:use-attribute-sets="Titre-sequence">
+				
+				<fo:block xsl:use-attribute-sets="Titre-sequence" border-color="black" border-style="solid">
 					<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
 				</fo:block>
 
@@ -221,7 +222,14 @@
 		<fo:block xsl:use-attribute-sets="Titre-paragraphe">
 			<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
 		</fo:block>
-
+		
+		<fo:block>
+			<xsl:value-of select="current()/node()"/>First-Check
+			<xsl:value-of select="ancestor::node()[2]"/>Second-Check
+			<xsl:value-of select="count(preceding::Module/SubModule)"/>Third-Check
+			<xsl:value-of select="position()"/>Firth-Check
+		</fo:block>
+		
 		<!--Revient au parent A RAJOUTER DANS CHAQUE TEMPLATE -->
 		<xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
 			<xsl:with-param name="driver" select="." tunnel="yes"/>
@@ -241,7 +249,7 @@
 		<!--<xf-output/>-->
 		<!--<NBRowspan><xsl:value-of select="enofr:get-rowspan($source-context)"/></NBRowspan>
 		<NBColspan><xsl:value-of select="enofr:get-colspan($source-context)"/></NBColspan>-->
-
+		
 		<fo:block xsl:use-attribute-sets="general-style">
 			<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
 		</fo:block>
@@ -273,6 +281,28 @@
 		</xsl:apply-templates>
 
 	</xsl:template>
+	
+	<xsl:template match="//Form/Module/SubModule/xf-output" mode="model">
+		<xsl:param name="source-context" as="item()" tunnel="yes"/>
+		<xsl:variable name="languages" select="enofr:get-form-languages($source-context)"
+			as="xs:string +"/>
+		
+		<xsl:if test="enofr:get-label($source-context, $languages[1]) != ''">
+			<fo:block xsl:use-attribute-sets="general-style">
+				<!--<fo:inline font-family="ZapfDingbats" font-size="10pt">&#x274F;</fo:inline>-->
+				<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
+			</fo:block>
+		</xsl:if>
+		
+		
+		<!--Revient au parent A RAJOUTER DANS CHAQUE TEMPLATE -->
+		<fo:block>
+			<xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
+				<xsl:with-param name="driver" select="." tunnel="yes"/>
+			</xsl:apply-templates>
+		</fo:block>
+		
+	</xsl:template>
 
 	<!--<xsl:template match="//TextCell/xf-output" mode="model">
 		<xsl:param name="source-context" as="item()" tunnel="yes"/>
@@ -297,9 +327,10 @@
 	<!-- Déclenche tous les xf-input de l'arbre des divers s'il est précédé su driver Module :  DONNEES QUI DOIVENT ETRE RENSEIGNEES DANS LE QUESTIONNAIRE-->
 	<xsl:template match="xf-input" mode="model">
 		<xsl:param name="source-context" as="item()" tunnel="yes"/>
+		<xsl:param name="position" tunnel="yes"/>
 		<xsl:variable name="languages" select="enofr:get-form-languages($source-context)"
 			as="xs:string +"/>
-
+		
 		<!-- FLAG Recupérer les formats des réponses pour anticiper le cadre -->
 		<!-- <xf-input/>
 			<Type><xsl:value-of select="enofr:get-type($source-context)"/></Type>
@@ -309,33 +340,60 @@
 			<Unite><xsl:value-of select="enofr:get-suffix($source-context, $languages[1])"/></Unite>	-->
 		<xsl:if test="enofr:get-label($source-context, $languages[1]) != ''">
 			<xsl:if test="enofr:get-type($source-context) = 'text'">
-				<fo:block xsl:use-attribute-sets="general-style">
-				<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
-					<fo:block>............................................................................................................................................................................................................</fo:block>
+				<fo:block>
+					<xsl:if test="enofr:get-label($source-context, $languages[1]) != ''">
+						<fo:block xsl:use-attribute-sets="label-question">
+							<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>						
+						</fo:block>
+					</xsl:if>
+					<fo:block xsl:use-attribute-sets="Line-drawing">
+						&#160;
+					</fo:block>
 				</fo:block>
 			</xsl:if>
 
 			<xsl:if test="enofr:get-type($source-context) = 'date'">
-				<fo:block xsl:use-attribute-sets="general-style">
-					<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
-					<fo:block>..../..../....</fo:block>
-				</fo:block>
+				<xsl:variable name="field" select="enofr:get-format($source-context)"/>
+				<fo:block xsl:use-attribute-sets="general-style">|__|__|__|__|__|__|__|__| ( <xsl:value-of select="$field"/> ) </fo:block>
 			</xsl:if>
 			
 			<xsl:if test="enofr:get-type($source-context) = 'duration'">
-				<xsl:variable name="field" select="enofr:get-label($source-context, $languages[1])"/>
-				<fo:inline border-color="black" border-style="solid" width="15%"></fo:inline>
-				<fo:inline><xsl:value-of select="$field"/></fo:inline>					
+				<fo:inline xsl:use-attribute-sets="general-style">
+					<xsl:variable name="field" select="enofr:get-format($source-context)"/>
+						<xsl:for-each select="1 to 10">
+							<xsl:variable name="curVal" select="."/>
+							<xsl:if test="number(enofr:get-length($source-context)) = $curVal">
+								<xsl:for-each select="1 to $curVal">
+									<xsl:variable name="curVal2" select="."/>
+									<xsl:choose>
+										<xsl:when test="$curVal2 = $curVal">|__|</xsl:when>
+										<xsl:otherwise>|__</xsl:otherwise>
+									</xsl:choose>
+								</xsl:for-each>
+							</xsl:if>
+						</xsl:for-each>
+					<fo:inline xsl:use-attribute-sets="general-style">
+						<xsl:choose>
+							<xsl:when test="$field = 'hh'">heures</xsl:when>
+							<xsl:when test="$field = 'mm'">minutes</xsl:when>
+							<xsl:otherwise><xsl:value-of select="$field"/></xsl:otherwise>
+						</xsl:choose>
+					</fo:inline>
+				</fo:inline>
 			</xsl:if>
 			
 			<!-- get-numberof decimal -->
 			<xsl:if test="enofr:get-type($source-context) = 'number'">
-				<fo:block xsl:use-attribute-sets="general-style">
-					<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
+				<fo:block>
+					<xsl:if test="enofr:get-label($source-context, $languages[1]) != ''">
+						<fo:block xsl:use-attribute-sets="label-question">
+							<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>						
+						</fo:block>
+					</xsl:if>
 					<xsl:for-each select="1 to 10">
 						<xsl:variable name="curVal" select="."/>
 						<xsl:if test="number(enofr:get-length($source-context)) = $curVal">
-							<fo:block>
+							<fo:block xsl:use-attribute-sets="general-style">
 								<xsl:for-each select="1 to $curVal">
 									<xsl:variable name="curVal2" select="."/>
 									<xsl:choose>
@@ -353,33 +411,60 @@
 
 		<xsl:if test="enofr:get-label($source-context, $languages[1]) = ''">
 			<xsl:if test="enofr:get-type($source-context) = 'text'">
-				<fo:block xsl:use-attribute-sets="general-style">
-					<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
-					<fo:block>|.............|</fo:block>
+				<fo:block>
+					<xsl:if test="enofr:get-label($source-context, $languages[1]) != ''">
+						<fo:block xsl:use-attribute-sets="label-question">
+							<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>						
+						</fo:block>
+					</xsl:if>
+					<fo:block xsl:use-attribute-sets="Line-drawing">
+						&#160;
+					</fo:block>
 				</fo:block>
 			</xsl:if>
 
 			<xsl:if test="enofr:get-type($source-context) = 'date'">
-				<fo:block xsl:use-attribute-sets="general-style">
-					<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
-					<fo:block>..../..../....</fo:block>
-				</fo:block>
+				<xsl:variable name="field" select="enofr:get-format($source-context)"/>
+				<fo:block xsl:use-attribute-sets="general-style">|__|__|__|__|__|__|__|__| ( <xsl:value-of select="$field"/> ) </fo:block>
 			</xsl:if>
 			
-			<xsl:if test="enofr:get-type($source-context) = 'duration'">
-				<xsl:variable name="field" select="enofr:get-format($source-context)"/>
-				<fo:inline xsl:use-attribute-sets="general-style">|___|___|</fo:inline>
-				<fo:inline xsl:use-attribute-sets="general-style"><xsl:value-of select="$field"/></fo:inline>					
+			<xsl:if test="enofr:get-type($source-context) = 'duration'"> 
+				<fo:inline xsl:use-attribute-sets="general-style">
+					<xsl:variable name="field" select="enofr:get-format($source-context)"/>
+					<xsl:for-each select="1 to 10">
+						<xsl:variable name="curVal" select="."/>
+						<xsl:if test="number(enofr:get-length($source-context)) = $curVal">
+							<xsl:for-each select="1 to $curVal">
+								<xsl:variable name="curVal2" select="."/>
+								<xsl:choose>
+									<xsl:when test="$curVal2 = $curVal">|__|</xsl:when>
+									<xsl:otherwise>|__</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+						</xsl:if>
+					</xsl:for-each>
+					<fo:inline xsl:use-attribute-sets="general-style">
+						<xsl:choose>
+							<xsl:when test="$field = 'hh'">heures</xsl:when>
+							<xsl:when test="$field = 'mm'">minutes</xsl:when>
+							<xsl:otherwise><xsl:value-of select="$field"/></xsl:otherwise>
+						</xsl:choose>
+					</fo:inline>
+				</fo:inline>
 			</xsl:if>
 
 
 			<xsl:if test="enofr:get-type($source-context) = 'number'">
-				<fo:block xsl:use-attribute-sets="general-style">
-					<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
+				<fo:block>
+					<xsl:if test="enofr:get-label($source-context, $languages[1]) != ''">
+						<fo:block xsl:use-attribute-sets="label-question">
+							<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
+						</fo:block>
+					</xsl:if>
 					<xsl:for-each select="1 to 10">
 						<xsl:variable name="curVal" select="."/>
 						<xsl:if test="number(enofr:get-length($source-context)) = $curVal">
-							<fo:block>
+							<fo:block xsl:use-attribute-sets="general-style">
 								<xsl:for-each select="1 to $curVal">
 									<xsl:variable name="curVal2" select="."/>
 									<xsl:choose>
@@ -444,7 +529,7 @@
 			<xsl:when test="enofr:get-label($source-context, $languages[1]) != ''">
 					<!-- label output not in table -->
 					<fo:block xsl:use-attribute-sets="general-style">
-						<fo:inline font-family="ZapfDingbats" font-size="10pt" padding-right="7mm"
+						<fo:inline font-family="ZapfDingbats" font-size="10pt" padding-right="5mm"
 							margin-top="3mm">&#x274F;</fo:inline>
 						<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
 					</fo:block>
@@ -497,28 +582,35 @@
 
 	<!-- Déclenche tous les xf-select de l'arbre des divers -->
 	<xsl:template match="xf-select1" mode="model">
+		
 		<xsl:param name="source-context" as="item()" tunnel="yes"/>
+		<xsl:param name="position" tunnel="yes"/>
 		<xsl:variable name="languages" select="enofr:get-form-languages($source-context)"
 			as="xs:string +"/>
 		<xsl:variable name="format" select="enofr:get-appearance($source-context)"/>
 		
-		<xsl:if test="enofr:get-label($source-context, $languages[1]) != ''">
-			<fo:block xsl:use-attribute-sets="label-question">
-				<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
-			</fo:block>
-		</xsl:if>
 		
-		<xsl:choose>
-			<xsl:when test="$format = 'minimal'">
-				<fo:block>............................................................................................................................................................................................................</fo:block>
-			</xsl:when>
-			<xsl:otherwise>
-				<!--Revient au parent A RAJOUTER DANS CHAQUE TEMPLATE  -->
-				<xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
-					<xsl:with-param name="driver" select="." tunnel="yes"/>
-				</xsl:apply-templates>
-			</xsl:otherwise>
-		</xsl:choose>
+		<fo:block page-break-inside="avoid">
+			<xsl:if test="enofr:get-label($source-context, $languages[1]) != ''">
+				<fo:block xsl:use-attribute-sets="label-question">
+					<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
+				</fo:block>
+			</xsl:if>
+			
+			<xsl:choose>
+				<xsl:when test="$format = 'minimal'">
+					<fo:block xsl:use-attribute-sets="Line-drawing">
+						&#160;
+					</fo:block>
+				</xsl:when>
+				<xsl:otherwise>
+						<!--Revient au parent A RAJOUTER DANS CHAQUE TEMPLATE  -->
+						<xsl:apply-templates select="eno:child-fields($source-context)" mode="source">
+							<xsl:with-param name="driver" select="." tunnel="yes"/>
+						</xsl:apply-templates>
+				</xsl:otherwise>
+			</xsl:choose>
+		</fo:block>
 
 	</xsl:template>
 
@@ -543,7 +635,7 @@
 			<NBBodyLine><xsl:value-of select="count(enofr:get-body-line($source-context, position()))"/></NBBodyLine>-->
 
 
-		<fo:table table-layout="fixed" width="100%" font-size="10pt" border-width="0.35mm"
+		<fo:table inline-progression-dimension="auto" table-layout="auto" font-size="10pt" border-width="0.35mm"
 			text-align="center" display-align="center" space-after="5mm">
 
 			<!-- Avant d'entrer dans un for-each, sauvegarde obligatoire de l'arbre des driver -->
@@ -617,7 +709,7 @@
 
 	</xsl:template>
 
-	<!--TableLoop renvoie seulment des headers avec des lignes vierges en dessous (rowloop est dupliqué) -->
+	<!--TableLoop renvoie seulment des headers avec des lignes vierges en des- (rowloop est dupliqué) -->
 	<xsl:template match="TableLoop" mode="model">
 		<xsl:param name="source-context" as="item()" tunnel="yes"/>
 		<xsl:param name="languages" tunnel="yes"/>
@@ -814,20 +906,20 @@
 			<xsl:value-of select="enofr:get-label($source-context, $languages[1])"/>
 		</fo:block>
 		
-		<fo:block>
-			.......................................................................................................................................................
+		<fo:block xsl:use-attribute-sets="Line-drawing">
+			&#160;
 		</fo:block>
-		<fo:block>
-			.......................................................................................................................................................
+		<fo:block xsl:use-attribute-sets="Line-drawing">
+			&#160;
 		</fo:block>
-		<fo:block>
-			.......................................................................................................................................................
+		<fo:block xsl:use-attribute-sets="Line-drawing">
+			&#160;
 		</fo:block>
-		<fo:block>
-			.......................................................................................................................................................
+		<fo:block xsl:use-attribute-sets="Line-drawing">
+			&#160;
 		</fo:block>
-		<fo:block>
-			.......................................................................................................................................................
+		<fo:block xsl:use-attribute-sets="Line-drawing">
+			&#160;
 		</fo:block>
 		
 		<!-- Temporaire -->
