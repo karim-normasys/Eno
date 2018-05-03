@@ -1,5 +1,10 @@
 # Eno – Questionnaire generator
 
+[![Build Status](https://travis-ci.org/InseeFr/Eno.svg?branch=master)](https://travis-ci.org/InseeFr/Eno)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/fr.insee.eno/eno-core/badge.svg)](https://maven-badges.herokuapp.com/maven-central/fr.insee.eno/eno-core)
+
+
+
 ## Introduction
 
 Eno is a tool that generates survey questionnaires starting from their formal description in [DDI](http://ddialliance.org/).
@@ -10,6 +15,29 @@ Due to its modular design, Eno can create questionnaires in different formats fr
  
 The generation of XForms forms is performed using a number of XSLT transformations from a DDI input managed by a Ant script.
  
+
+### With Java
+
+Use the maven dependency to provide the Jar from maven central
+
+`
+	
+	<dependency>
+
+		<groupId>fr.insee.eno</groupId>
+		
+		<artifactId>eno-core</artifactId>
+		
+		<version>1.0.0</version>
+	
+	</dependency>
+`
+
+
+See examples in `src/test/resources`
+
+
+### With Ant
 
 The main Ant build file is [/src/main/scripts/build_non_regression.xml] and its main target is "full".
 
@@ -28,7 +56,7 @@ The generated XForms output will be located in a subdirectory of [/questionnaire
 
 ## Getting Started
  
-### Prior : 
+### Prior for Ant usage: 
  
  * Apache Ant. You can download Ant from Apache, see also : [Ant Apache](http://ant.apache.org/)
  
@@ -42,7 +70,7 @@ Then you have to donwload Java Libraries :
 * Common lang 3 or higher (for the non regression test only), see also : [Apache Commons lang](https://commons.apache.org/proper/commons-lang/)
 
 Paste the ".jar" file in a "/lib/" folder at the Eno project root.
- 
+
 
 ### Example : 
  
@@ -63,5 +91,6 @@ The expected XForms form file for the Simpsons questionnaire is present in [/que
 The difference file [questionnaire/simpsons/Xforms/v1/diff.txt] specifed, if there has, index at which the file begins to differ and the difference beetwen the generated Xform file and the expected Xform file.
 
 ## Road Map
+
 
 New output format : PDF for paper questionnaire

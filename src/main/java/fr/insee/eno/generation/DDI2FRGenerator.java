@@ -6,16 +6,16 @@ import java.io.OutputStream;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import fr.insee.eno.Constants;
 import fr.insee.eno.transform.xsl.XslParameters;
 import fr.insee.eno.transform.xsl.XslTransformation;
-import fr.insee.eno.Constants;
 
 public class DDI2FRGenerator implements Generator {
 	
-	private static final Logger logger = LogManager.getLogger(DDI2FRGenerator.class);
+	private static final Logger logger = LoggerFactory.getLogger(DDI2FRGenerator.class);
 	
 	// FIXME Inject !
 	private static XslTransformation saxonService = new XslTransformation();
@@ -36,12 +36,15 @@ public class DDI2FRGenerator implements Generator {
 		
 		
 		InputStream isTRANSFORMATIONS_DDI2FR_DDI2FR_XSL = Constants.getInputStreamFromPath(Constants.TRANSFORMATIONS_DDI2FR_DDI2FR_XSL);
-		InputStream isPROPERTIES_FILE = Constants.getInputStreamFromPath(Constants.PROPERTIES_FILE);
+		InputStream isPROPERTIES_FILE = Constants.getInputStreamFromPath(Constants.PROPERTIES_FILE_FR);
 		InputStream isPARAMETERS_FILE = Constants.getInputStreamFromPath(Constants.PARAMETERS_FILE);
 		
+		InputStream isFinalInput = FileUtils.openInputStream(finalInput);
+		OutputStream osOutputBasicForm = FileUtils.openOutputStream(new File(outputBasicFormPath));
+		
 		saxonService.transformDDI2FR(
-				FileUtils.openInputStream(finalInput),
-				FileUtils.openOutputStream(new File(outputBasicFormPath)),
+				isFinalInput,
+				osOutputBasicForm,
 				isTRANSFORMATIONS_DDI2FR_DDI2FR_XSL,
 				isPROPERTIES_FILE,
 				isPARAMETERS_FILE);
@@ -49,13 +52,15 @@ public class DDI2FRGenerator implements Generator {
 		isTRANSFORMATIONS_DDI2FR_DDI2FR_XSL.close();
 		isPROPERTIES_FILE.close();
 		isPARAMETERS_FILE.close();
+		isFinalInput.close();
+		osOutputBasicForm.close();
 		
 		String outputForm = Constants.TEMP_FOLDER_PATH + "/" + surveyName + "/" + formNameFolder + "/form/form.xhtml";
 		
 		InputStream isOutputBasicFormPath = FileUtils.openInputStream(new File(outputBasicFormPath));
 		OutputStream osOutputForm = FileUtils.openOutputStream(new File(outputForm));
-		InputStream isBROWSING_TEMPLATE_XSL = Constants.getInputStreamFromPath(Constants.BROWSING_TEMPLATE_XSL);
-		saxonService.transformBrowsing(
+		InputStream isBROWSING_TEMPLATE_XSL = Constants.getInputStreamFromPath(Constants.BROWSING_FR_TEMPLATE_XSL);
+		saxonService.transformBrowsingDDI2FR(
 				isOutputBasicFormPath,
 				osOutputForm,
 				isBROWSING_TEMPLATE_XSL,

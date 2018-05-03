@@ -1,19 +1,57 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>fr.insee</groupId>
+	<groupId>fr.insee.eno</groupId>
 	<artifactId>eno-core</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
+	<packaging>jar</packaging>
+
+	<name>Eno – Questionnaire generator</name>
+	<description>Eno is a tool that generates survey questionnaires starting from their formal description in DDI</description>
+	<url>https://inseefr.github.io/Eno/eno-for-dummies</url>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:https://github.com/InseeFr/Eno.git</connection>
+		<developerConnection>scm:git:https://github.com/InseeFr/Eno.git</developerConnection>
+		<url>https://github.com/InseeFr/Eno/tree/${project.scm.tag}</url>
+		<tag>master</tag>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/InseeFr/Eno/issues</url>
+	</issueManagement>
+
+	<ciManagement>
+		<system>Travis</system>
+		<url>https://travis-ci.org/InseeFr/Eno</url>
+	</ciManagement>
+
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 	<properties>
 		<guice.version>4.1.0</guice.version>
-		<log4j.version>2.8.1</log4j.version>
 		<commons-io.version>2.5</commons-io.version>
 		<saxon.version>9.7.0-8</saxon.version>
-
-		<sources.plugin.version>2.0.4</sources.plugin.version>
-		<javadoc.plugin.version>2.3</javadoc.plugin.version>
-
+		<fop.version>2.2</fop.version>
+		<source.plugin.version>3.0.1</source.plugin.version>
+		<javadoc.plugin.version>3.0.0</javadoc.plugin.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<compiler.source>1.8</compiler.source>
 		<compiler.target>1.8</compiler.target>
@@ -27,24 +65,33 @@
 			<version>${saxon.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>xalan</groupId>
+			<artifactId>xalan</artifactId>
+			<version>2.7.1</version>
+		</dependency>
+		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
 			<version>${guice.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-api</artifactId>
-			<version>${log4j.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.apache.logging.log4j</groupId>
-			<artifactId>log4j-core</artifactId>
-			<version>${log4j.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>${commons-io.version}</version>
+		</dependency>
+
+		<!-- PDF dependency -->
+		<dependency>
+			<groupId>org.apache.xmlgraphics</groupId>
+			<artifactId>fop</artifactId>
+			<version>${fop.version}</version>
+		</dependency>
+
+		<!-- LOG4j and SL4J depandancies -->
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.25</version>
 		</dependency>
 
 		<!-- Test dependencies -->
@@ -60,23 +107,24 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.xmlunit</groupId>
+			<artifactId>xmlunit-matchers</artifactId>
+			<version>2.3.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-slf4j-impl</artifactId>
+			<version>2.11.0</version>
+			<scope>test</scope>
+		</dependency>
+
+
+
 	</dependencies>
 
 	<build>
-<!-- 		<resources> -->
-<!-- 			<resource> -->
-<!-- 				<directory>src/main/xslt</directory> -->
-<!-- 				<includes> -->
-<!-- 					<include>**/*.*</include> -->
-<!-- 				</includes> -->
-<!-- 			</resource> -->
-<!-- 			<resource> -->
-<!-- 				<directory>src/main/resources</directory> -->
-<!-- 				<includes> -->
-<!-- 					<include>**/*.*</include> -->
-<!-- 				</includes> -->
-<!-- 			</resource> -->
-<!-- 		</resources> -->
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -109,32 +157,95 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>${sources.plugin.version}</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>${javadoc.plugin.version}</version>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-source-plugin</artifactId>
+						<version>${source.plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-sources</id>
+								<goals>
+									<goal>jar-no-fork</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-javadoc-plugin</artifactId>
+						<version>${javadoc.plugin.version}</version>
+						<executions>
+							<execution>
+								<id>attach-javadocs</id>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.sonatype.plugins</groupId>
+						<artifactId>nexus-staging-maven-plugin</artifactId>
+						<version>1.6.8</version>
+						<extensions>true</extensions>
+						<configuration>
+							<serverId>ossrh</serverId>
+							<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+							<autoReleaseAfterClose>true</autoReleaseAfterClose>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+	<developers>
+		<developer>
+			<name>François Bulot</name>
+		</developer>
+		<developer>
+			<name>Guillaume Jardillier</name>
+		</developer>
+		<developer>
+			<name>Eric Sigaud</name>
+		</developer>
+		<developer>
+			<name>Benoit Werquin</name>
+		</developer>
+	</developers>
+
+	<contributors>
+		<contributor>
+			<name>Franck Cotton</name>
+		</contributor>
+		<contributor>
+			<name>Thomas Dubois</name>
+		</contributor>
+		<contributor>
+			<name>Heïdi Koumarianos</name>
+		</contributor>
+	</contributors>
+
 </project>
